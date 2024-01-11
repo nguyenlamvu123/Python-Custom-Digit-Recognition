@@ -8,12 +8,12 @@ networkx==2.5
 numpy==1.22.0
 opencv-python==4.2.0.32
 Pillow==10.0.1
-pkg-resources==0.0.0
+#pkg-resources==0.0.0
 pyparsing==2.4.7
 python-dateutil==2.8.1
 PyYAML==5.4
-scikit-image==0.12.1
-scikit-learn==0.21.3
+scikit-image
+scikit-learn
 scipy==1.10.0
 six==1.15.0
 toolz==0.11.1

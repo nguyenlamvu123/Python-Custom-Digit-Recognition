@@ -118,7 +118,7 @@ def proc_user_img(img_file, model):
     blank_image.fill(255)
 
     imgray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-    plt.imshow(imgray)
+    # plt.imshow(imgray)
     kernel = np.ones((5, 5), np.uint8)
 
     ret, thresh = cv2.threshold(imgray, 127, 255, 0)
@@ -142,10 +142,13 @@ def proc_user_img(img_file, model):
         cv2.putText(im, str(int(pred[0])), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 3)
         cv2.putText(blank_image, str(int(pred[0])), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 5)
 
-    plt.imshow(im)
-    cv2.imwrite("original_overlay.png", im)
-    cv2.imwrite("final_digits.png", blank_image)
-    # cv2.destroyAllWindows()
+    cv2.imshow("original_overlay.png", im)
+    cv2.imshow("final_digits.png", blank_image)
+    cv2.waitKey()
+    # plt.imshow(im)
+    # cv2.imwrite("original_overlay.png", im)
+    # cv2.imwrite("final_digits.png", blank_image)
+    cv2.destroyAllWindows()
 
 
 def get_contour_precedence(contour, cols):
@@ -161,7 +164,7 @@ def load_digits_custom(img_file):
     start_class = 1
     im = cv2.imread(img_file)
     imgray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-    plt.imshow(imgray)
+    # plt.imshow(imgray)
     kernel = np.ones((5, 5), np.uint8)
 
     ret, thresh = cv2.threshold(imgray, 127, 255, 0)
@@ -198,9 +201,8 @@ TRAIN_MNIST_IMG = 'digits.png'
 TRAIN_USER_IMG = 'custom_train_digits.jpg'
 TEST_USER_IMG = 'test_image.png'
 
-# digits, labels = load_digits(TRAIN_MNIST_IMG) #original MNIST data (not good detection)
-digits, labels = load_digits_custom(
-    TRAIN_USER_IMG)  # my handwritten dataset (better than MNIST on my handwritten digits)
+# digits, labels = load_digits(TRAIN_MNIST_IMG)  # original MNIST data (not good detection)
+digits, labels = load_digits_custom(TRAIN_USER_IMG)  # my handwritten dataset (better than MNIST on my handwritten digits)
 
 print('train data shape', digits.shape)
 print('test data shape', labels.shape)
@@ -211,22 +213,34 @@ X_train, X_test, y_train, y_test = train_test_split(train_digits_data, labels, t
 
 # ------------------training and testing----------------------------------------
 
-model = KNN_MODEL(k=3)
+# model = KNN_MODEL(k=3)
+# model.train(X_train, y_train)
+# preds = model.predict(X_test)
+# print('Accuracy: ', accuracy_score(y_test, preds))
+#
+# model = KNN_MODEL(k=4)
+# model.train(train_digits_data, labels)
+
+model = SVM_MODEL(num_feats=train_digits_data.shape[1])
 model.train(X_train, y_train)
 preds = model.predict(X_test)
 print('Accuracy: ', accuracy_score(y_test, preds))
 
-model = KNN_MODEL(k=4)
-model.train(train_digits_data, labels)
-proc_user_img(TEST_USER_IMG, model)
-
-model = SVM_MODEL(num_feats=train_digits_data.shape[1])
-model.train(X_train, y_train)
-preds = model.predict(X_test)
-print('Accuracy: ', accuracy_score(y_test, preds))
-
 model = SVM_MODEL(num_feats=train_digits_data.shape[1])
 model.train(train_digits_data, labels)
-proc_user_img(TEST_USER_IMG, model)
+
+
+# proc_user_img(TEST_USER_IMG, model)
+for img in (
+        'photo_6118490984477211115_y.jpg',
+        'photo_6118490984477211116_y.jpg',
+        'photo_6118490984477211117_y.jpg',
+        'photo_6118490984477211118_y.jpg',
+        'photo_6118490984477211119_y.jpg',
+        'photo_6118490984477211120_y.jpg',
+        'photo_6118490984477211121_y.jpg',
+        # "digit.jpg",
+):
+    proc_user_img(img, model)
 
 # ------------------------------------------------------------------------------
