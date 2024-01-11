@@ -196,51 +196,53 @@ def load_digits_custom(img_file):
 
 
 # ------------------data preparation--------------------------------------------
+if __name__ == '__main__':
+    TRAIN_MNIST_IMG = 'digits.png'
+    TRAIN_USER_IMG = 'custom_train_digits.jpg'
+    TEST_USER_IMG = 'test_image.png'
 
-TRAIN_MNIST_IMG = 'digits.png'
-TRAIN_USER_IMG = 'custom_train_digits.jpg'
-TEST_USER_IMG = 'test_image.png'
+    digits_mnist, labels_mnist = load_digits(TRAIN_MNIST_IMG)  # original MNIST data (not good detection)
+    digits_custom, labels_custom = load_digits_custom(TRAIN_USER_IMG)  # my handwritten dataset (better than MNIST on my handwritten digits)
+    digits = np.concatenate((digits_mnist, digits_custom), axis=0)
+    labels = np.concatenate((labels_mnist, labels_custom), axis=0)
 
-# digits, labels = load_digits(TRAIN_MNIST_IMG)  # original MNIST data (not good detection)
-digits, labels = load_digits_custom(TRAIN_USER_IMG)  # my handwritten dataset (better than MNIST on my handwritten digits)
+    print('train data shape', digits.shape)
+    print('test data shape', labels.shape)
 
-print('train data shape', digits.shape)
-print('test data shape', labels.shape)
+    digits, labels = shuffle(digits, labels, random_state=256)
+    train_digits_data = pixels_to_hog_20(digits)
+    X_train, X_test, y_train, y_test = train_test_split(train_digits_data, labels, test_size=0.33, random_state=42)
 
-digits, labels = shuffle(digits, labels, random_state=256)
-train_digits_data = pixels_to_hog_20(digits)
-X_train, X_test, y_train, y_test = train_test_split(train_digits_data, labels, test_size=0.33, random_state=42)
+    # ------------------training and testing----------------------------------------
 
-# ------------------training and testing----------------------------------------
+    # model = KNN_MODEL(k=3)
+    # model.train(X_train, y_train)
+    # preds = model.predict(X_test)
+    # print('Accuracy: ', accuracy_score(y_test, preds))
+    #
+    # model = KNN_MODEL(k=4)
+    # model.train(train_digits_data, labels)
 
-# model = KNN_MODEL(k=3)
-# model.train(X_train, y_train)
-# preds = model.predict(X_test)
-# print('Accuracy: ', accuracy_score(y_test, preds))
-#
-# model = KNN_MODEL(k=4)
-# model.train(train_digits_data, labels)
+    model = SVM_MODEL(num_feats=train_digits_data.shape[1])
+    model.train(X_train, y_train)
+    preds = model.predict(X_test)
+    print('Accuracy: ', accuracy_score(y_test, preds))
 
-model = SVM_MODEL(num_feats=train_digits_data.shape[1])
-model.train(X_train, y_train)
-preds = model.predict(X_test)
-print('Accuracy: ', accuracy_score(y_test, preds))
-
-model = SVM_MODEL(num_feats=train_digits_data.shape[1])
-model.train(train_digits_data, labels)
+    model = SVM_MODEL(num_feats=train_digits_data.shape[1])
+    model.train(train_digits_data, labels)
 
 
-# proc_user_img(TEST_USER_IMG, model)
-for img in (
-        'photo_6118490984477211115_y.jpg',
-        'photo_6118490984477211116_y.jpg',
-        'photo_6118490984477211117_y.jpg',
-        'photo_6118490984477211118_y.jpg',
-        'photo_6118490984477211119_y.jpg',
-        'photo_6118490984477211120_y.jpg',
-        'photo_6118490984477211121_y.jpg',
-        # "digit.jpg",
-):
-    proc_user_img(img, model)
+    # proc_user_img(TEST_USER_IMG, model)
+    for img in (
+            'photo_6118490984477211115_y.jpg',
+            'photo_6118490984477211116_y.jpg',
+            'photo_6118490984477211117_y.jpg',
+            'photo_6118490984477211118_y.jpg',
+            'photo_6118490984477211119_y.jpg',
+            'photo_6118490984477211120_y.jpg',
+            'photo_6118490984477211121_y.jpg',
+            # "digit.jpg",
+    ):
+        proc_user_img(img, model)
 
 # ------------------------------------------------------------------------------
